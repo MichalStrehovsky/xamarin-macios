@@ -13,7 +13,7 @@ namespace Microsoft.Macios.Generator.Tests.Emitters;
 
 public class BindingSyntaxFactoryObjCRuntimeTests {
 	
-	class TestDataCodeChangesFromClassDeclaration : IEnumerable<object []> {
+	class TestDataCastToNative : IEnumerable<object []> {
 		public IEnumerator<object []> GetEnumerator ()
 		{
 			
@@ -51,10 +51,58 @@ public class BindingSyntaxFactoryObjCRuntimeTests {
 	}
 
 	[Theory]
-	[ClassData(typeof(TestDataCodeChangesFromClassDeclaration))]
+	[ClassData(typeof(TestDataCastToNative))]
 	void CastToNativeTests (Parameter parameter, string? expectedCast)
 	{
 		var expression = CastToNative (parameter);
+		if (expectedCast is null) {
+			Assert.Null (expression);	
+		} else {
+			Assert.NotNull (expression);
+			Assert.Equal (expectedCast, expression?.ToString ());
+		}
+	}
+	
+	class TestDataCastToPrimitive: IEnumerable<object []> {
+		public IEnumerator<object []> GetEnumerator ()
+		{
+			// not enum parameter
+			var boolParam = new Parameter (
+				position: 0, 
+				type: ReturnTypeForBool (),
+				name: "myParam");	
+			yield return [boolParam, null!];
+			
+			var enumParam = new Parameter (
+				position: 0, 
+				type: ReturnTypeForEnum ("MyEnum", isNativeEnum: false),
+				name: "myParam");	
+			
+			yield return [enumParam, "(int) myParam"];
+			
+			var byteParam = new Parameter (
+				position: 0, 
+				type: ReturnTypeForEnum ("MyEnum", isNativeEnum: false, underlyingType: SpecialType.System_Byte),
+				name: "myParam");	
+			
+			yield return [byteParam, "(byte) myParam"];
+			
+			
+			var longParam = new Parameter (
+				position: 0, 
+				type: ReturnTypeForEnum ("MyEnum", isNativeEnum: false, underlyingType: SpecialType.System_Int64),
+				name: "myParam");	
+			
+			yield return [longParam, "(long) myParam"];
+		}
+		IEnumerator IEnumerable.GetEnumerator () => GetEnumerator ();
+	}
+	
+	[Theory]
+	[ClassData(typeof(TestDataCastToPrimitive))]
+	void CastToPrimitiveTests (Parameter parameter, string? expectedCast)
+	{
+		var expression = CastToPrimitive (parameter);
 		if (expectedCast is null) {
 			Assert.Null (expression);	
 		} else {
