@@ -7,16 +7,16 @@ using Microsoft.CodeAnalysis;
 namespace Microsoft.Macios.Transformer.Attributes;
 
 readonly struct SnippetData : IEquatable<SnippetData> {
-	
+
 	public string Code { get; }
 
 	public bool Optimizable { get; }
-	
+
 	public SnippetData (string code)
 	{
 		Code = code;
 	}
-	
+
 	public SnippetData (string code, bool optimizable)
 	{
 		Code = code;
@@ -61,10 +61,10 @@ readonly struct SnippetData : IEquatable<SnippetData> {
 			}
 		}
 
-		data = new (code, optimizable); 
+		data = new (code, optimizable);
 		return true;
 	}
-	
+
 	public bool Equals (SnippetData other)
 	{
 		if (Code != other.Code)

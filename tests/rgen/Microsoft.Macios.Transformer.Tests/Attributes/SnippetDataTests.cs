@@ -13,7 +13,7 @@ namespace Microsoft.Macios.Transformer.Tests.Attributes;
 
 public class SnippetDataTests : BaseTransformerTestClass {
 	class TestDataTryCreate : IEnumerable<object []> {
-	
+
 		public IEnumerator<object []> GetEnumerator ()
 		{
 			const string path = "/some/random/path.cs";
@@ -30,8 +30,8 @@ namespace Test;
 [Dispose (""dispatcher = null;"", Optimizable = true)]
 interface NSButton { }
 ";
-			
-			yield return [(Source: disposeAttribute, Path: path), new SnippetData("dispatcher = null;", true)];
+
+			yield return [(Source: disposeAttribute, Path: path), new SnippetData ("dispatcher = null;", true)];
 		}
 
 		IEnumerator IEnumerable.GetEnumerator () => GetEnumerator ();
