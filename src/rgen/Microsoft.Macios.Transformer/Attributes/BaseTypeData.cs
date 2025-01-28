@@ -128,4 +128,15 @@ readonly record struct BaseTypeData {
 		hash.Add (KeepRefUntil);
 		return hash.ToHashCode ();
 	}
+
+	public override string ToString ()
+	{
+		var sb = new StringBuilder ($"BaseTypeData {{ BaseType: {BaseType}, Name: {Name ?? "null"}, ");
+		sb.Append ("Events: [");
+		sb.AppendJoin (", ", Events);
+		sb.Append ("], Delegates: [");
+		sb.AppendJoin (", ", Delegates);
+		sb.Append ($"], Singleton: {Singleton}, KeepRefUntil: {KeepRefUntil ?? "null"}, IsStubClass: {IsStubClass} }}");
+		return sb.ToString ();
+	}
 }
