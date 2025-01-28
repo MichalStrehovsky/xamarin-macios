@@ -8,7 +8,7 @@ using Microsoft.Macios.Generator;
 
 namespace Microsoft.Macios.Transformer.Attributes;
 
-readonly struct BaseTypeData : IEquatable<BaseTypeData> {
+readonly record struct BaseTypeData {
 
 	public string BaseType { get; } // is a type in the attribute, but we do not care for the transformation
 	public string? Name { get; init; } = null;
@@ -113,12 +113,6 @@ readonly struct BaseTypeData : IEquatable<BaseTypeData> {
 	}
 
 	/// <inheritdoc />
-	public override bool Equals (object? obj)
-	{
-		return obj is BaseTypeData other && Equals (other);
-	}
-
-	/// <inheritdoc />
 	public override int GetHashCode ()
 	{
 		var hash = new HashCode ();
@@ -133,26 +127,5 @@ readonly struct BaseTypeData : IEquatable<BaseTypeData> {
 		hash.Add (Singleton);
 		hash.Add (KeepRefUntil);
 		return hash.ToHashCode ();
-	}
-
-	public static bool operator == (BaseTypeData x, BaseTypeData y)
-	{
-		return x.Equals (y);
-	}
-
-	public static bool operator != (BaseTypeData x, BaseTypeData y)
-	{
-		return !(x == y);
-	}
-
-	public override string ToString ()
-	{
-		var sb = new StringBuilder ($"{{ BaseType: {BaseType}, Name: {Name ?? "null"}, ");
-		sb.Append ("Events: [");
-		sb.AppendJoin (", ", Events);
-		sb.Append ("], Delegates: [");
-		sb.AppendJoin (", ", Delegates);
-		sb.Append ($"], Singleton: {Singleton}, KeepRefUntil: {KeepRefUntil ?? "null"}, IsStubClass: {IsStubClass} }}");
-		return sb.ToString ();
 	}
 }
