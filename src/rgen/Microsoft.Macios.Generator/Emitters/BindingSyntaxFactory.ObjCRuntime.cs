@@ -24,9 +24,9 @@ static partial class BindingSyntaxFactory {
 	internal static LocalDeclarationStatementSyntax? GetHandleAuxVariable (in Parameter parameter,
 		bool withNullAllowed = false)
 	{
-		if (!parameter.Type.IsNSObject && !parameter.Type.IsINativeObject) 
+		if (!parameter.Type.IsNSObject && !parameter.Type.IsINativeObject)
 			return null;
-		
+
 		var variableName = parameter.GetNameForVariableType (Parameter.VariableType.Handle);
 		if (variableName is null)
 			return null;

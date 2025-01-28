@@ -11,39 +11,39 @@ using static Microsoft.Macios.Generator.Tests.TestDataFactory;
 namespace Microsoft.Macios.Generator.Tests.Emitters;
 
 public class BindingSyntaxFactoryObjCRuntimeTests {
-	
+
 	class TestDataCodeChangesFromClassDeclaration : IEnumerable<object []> {
 		public IEnumerator<object []> GetEnumerator ()
 		{
 			// nsobject type
 			yield return [
-				new Parameter (0, ReturnTypeForNSObject ("MyNSObject"), "myParam"), 
-				"var myParam__handle__ = myParam.GetHandle ();", 
+				new Parameter (0, ReturnTypeForNSObject ("MyNSObject"), "myParam"),
+				"var myParam__handle__ = myParam.GetHandle ();",
 				false
 			];
-			
+
 			yield return [
-				new Parameter (0, ReturnTypeForNSObject ("MyNSObject"), "myParam"), 
-				"var myParam__handle__ = myParam!.GetNonNullHandle ( nameof (myParam));", 
+				new Parameter (0, ReturnTypeForNSObject ("MyNSObject"), "myParam"),
+				"var myParam__handle__ = myParam!.GetNonNullHandle ( nameof (myParam));",
 				true
-			];	
-			
+			];
+
 			// interface type
 			yield return [
 				new Parameter (0, ReturnTypeForINativeObject ("MyNativeObject"), "myParam"),
-				"var myParam__handle__ = myParam.GetHandle ();", 
+				"var myParam__handle__ = myParam.GetHandle ();",
 				false
-			];	
-			
+			];
+
 			yield return [
 				new Parameter (0, ReturnTypeForINativeObject ("MyNativeObject"), "myParam"),
-				"var myParam__handle__ = myParam!.GetNonNullHandle ( nameof (myParam));", 
+				"var myParam__handle__ = myParam!.GetNonNullHandle ( nameof (myParam));",
 				true
-			];	
-			
+			];
+
 			// value type
 			yield return [
-				new Parameter (0, ReturnTypeForBool(), "myParam"),
+				new Parameter (0, ReturnTypeForBool (), "myParam"),
 				null!,
 				false
 			];
@@ -53,7 +53,7 @@ public class BindingSyntaxFactoryObjCRuntimeTests {
 	}
 
 	[Theory]
-	[ClassData (typeof(TestDataCodeChangesFromClassDeclaration))]
+	[ClassData (typeof (TestDataCodeChangesFromClassDeclaration))]
 	void GetHandleAuxVariableTests (in Parameter parameter, string? expectedDeclaration, bool withNullAllowed)
 	{
 		var declaration = GetHandleAuxVariable (parameter, withNullAllowed: withNullAllowed);
@@ -63,5 +63,5 @@ public class BindingSyntaxFactoryObjCRuntimeTests {
 			Assert.NotNull (declaration);
 			Assert.Equal (expectedDeclaration, declaration.ToString ());
 		}
-	} 
+	}
 }

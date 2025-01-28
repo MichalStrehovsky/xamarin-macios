@@ -300,7 +300,7 @@ static class TestDataFactory {
 		};
 
 	public static TypeInfo ReturnTypeForNSObject (string nsObjectName, bool isNullable = false)
-		=> new(
+		=> new (
 			name: nsObjectName,
 			isNullable: isNullable,
 			isArray: false
@@ -310,9 +310,9 @@ static class TestDataFactory {
 			Parents = ["Foundation.NSObject", "object"],
 			Interfaces = ["ObjCRuntime.INativeObject"]
 		};
-	
+
 	public static TypeInfo ReturnTypeForINativeObject (string nativeObjectName, bool isNullable = false)
-		=> new(
+		=> new (
 			name: nativeObjectName,
 			isNullable: isNullable,
 			isArray: false
