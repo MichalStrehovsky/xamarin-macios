@@ -5,10 +5,15 @@ using System;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.Macios.Generator.Attributes;
 using Microsoft.Macios.Generator.DataModel;
 using Microsoft.Macios.Generator.Extensions;
+using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using TypeInfo = Microsoft.Macios.Generator.DataModel.TypeInfo;
+using Parameter = Microsoft.Macios.Generator.DataModel.Parameter;
 
 namespace Microsoft.Macios.Generator.Emitters;
 
@@ -16,8 +21,66 @@ static partial class BindingSyntaxFactory {
 	readonly static string objc_msgSend = "objc_msgSend";
 	readonly static string objc_msgSendSuper = "objc_msgSendSuper";
 
+	internal static LocalDeclarationStatementSyntax? GetHandleAuxVariable (in Parameter parameter,
+		bool withNullAllowed = false)
+	{
+		if (!parameter.Type.IsNSObject && !parameter.Type.IsINativeObject) 
+			return null;
+		
+		var variableName = parameter.GetNameForVariableType (Parameter.VariableType.Handle);
+		if (variableName is null)
+			return null;
+		// decide about the factory based on the need of a null check 
+		InvocationExpressionSyntax factoryInvocation;
+		if (withNullAllowed) {
+			// generates: zone!.GetNonNullHandle (nameof (zone));
+			factoryInvocation = InvocationExpression (
+					MemberAccessExpression (SyntaxKind.SimpleMemberAccessExpression,
+						PostfixUnaryExpression (
+							SyntaxKind.SuppressNullableWarningExpression,
+							IdentifierName (parameter.Name)),
+						IdentifierName ("GetNonNullHandle").WithTrailingTrivia (Space)))
+				.WithArgumentList (ArgumentList (
+					SingletonSeparatedList<ArgumentSyntax> (Argument (
+						InvocationExpression (
+								IdentifierName (Identifier (TriviaList (Space), SyntaxKind.NameOfKeyword, "nameof",
+									"nameof",
+									TriviaList (Space))))
+							.WithArgumentList (ArgumentList (
+								SingletonSeparatedList<ArgumentSyntax> (
+									Argument (IdentifierName (parameter.Name)))))))));
+		} else {
+			// generates: zone.GetHandle ();
+			factoryInvocation = InvocationExpression (
+				MemberAccessExpression (SyntaxKind.SimpleMemberAccessExpression,
+					IdentifierName (parameter.Name),
+					IdentifierName ("GetHandle").WithTrailingTrivia (Space)));
+		}
+
+		// generates: variable = {FactoryCall}
+		var declarator = VariableDeclarator (Identifier (variableName))
+			.WithInitializer (EqualsValueClause (factoryInvocation.WithLeadingTrivia (Space)).WithLeadingTrivia (Space));
+		// generates the final statement: 
+		// var x = zone.GetHandle ();
+		// or 
+		// var x = zone!.GetNonNullHandle (nameof (constantValues));
+		return LocalDeclarationStatement (
+			VariableDeclaration (
+				IdentifierName (
+					Identifier (
+						TriviaList (),
+						SyntaxKind.VarKeyword,
+						"var",
+						"var",
+						TriviaList ()))).WithVariables (
+				SingletonSeparatedList (declarator.WithLeadingTrivia (Space))
+			));
+
+	}
+
 	static string? GetObjCMessageSendMethodName<T> (ExportData<T> exportData,
-		TypeInfo returnType, ImmutableArray<Parameter> parameters, bool isSuper = false, bool isStret = false) where T : Enum
+		TypeInfo returnType, ImmutableArray<Parameter> parameters, bool isSuper = false, bool isStret = false)
+		where T : Enum
 	{
 		var flags = exportData.Flags;
 		if (flags is null)
@@ -50,6 +113,7 @@ static partial class BindingSyntaxFactory {
 		if (isStret) {
 			sb.Append ("_stret");
 		}
+
 		// loop over params and get their native handler name
 		if (parameters.Length > 0) {
 			sb.Append ('_');
@@ -64,10 +128,12 @@ static partial class BindingSyntaxFactory {
 		} else if (flags.HasMarshalNativeExceptions ()) {
 			sb.Append ("_exception");
 		}
+
 		return sb.ToString ();
 	}
 
-	public static (string? Getter, string? Setter) GetObjCMessageSendMethods (in Property property, bool isSuper = false, bool isStret = false)
+	public static (string? Getter, string? Setter) GetObjCMessageSendMethods (in Property property,
+		bool isSuper = false, bool isStret = false)
 	{
 		if (property.IsProperty) {
 			// the getter and the setter depend of the accessors that have been set for the property, we do not want
@@ -92,6 +158,7 @@ static partial class BindingSyntaxFactory {
 						[property.ValueParameter], isSuper, isStret);
 				}
 			}
+
 			return (Getter: getterMsgSend, Setter: setterMsgSend);
 		}
 
@@ -99,6 +166,6 @@ static partial class BindingSyntaxFactory {
 	}
 
 	public static string? GetObjCMessageSendMethod (in Method method, bool isSuper = false, bool isStret = false)
-		=> GetObjCMessageSendMethodName (method.ExportMethodData, method.ReturnType, method.Parameters, isSuper, isStret);
-
+		=> GetObjCMessageSendMethodName (method.ExportMethodData, method.ReturnType, method.Parameters, isSuper,
+			isStret);
 }
