@@ -12,7 +12,7 @@ using Xamarin.Utils;
 namespace Microsoft.Macios.Transformer.Tests.Attributes;
 
 public class AsyncDataTests : BaseTransformerTestClass {
-	
+
 	class TestDataTryCreate : IEnumerable<object []> {
 		public IEnumerator<object []> GetEnumerator ()
 		{
@@ -56,10 +56,11 @@ interface NSTableViewDiffableDataSource {
 	void ApplySnapshot (NSObject snapshot, bool animatingDifferences, [NullAllowed] Action completion);
 }
 ";
-			
-			yield return [(Source: asyncResultTypeName, Path: path), new AsyncData {
-				ResultTypeName = "NSSpellCheckerCandidates"
-			}];
+
+			yield return [(Source: asyncResultTypeName, Path: path),
+				new AsyncData {
+					ResultTypeName = "NSSpellCheckerCandidates"
+				}];
 
 			const string asyncMethodName = @"
 using System;
@@ -79,10 +80,11 @@ interface NSTableViewDiffableDataSource {
 	void ApplySnapshot (NSObject snapshot, bool animatingDifferences, [NullAllowed] Action completion);
 }
 ";
-			
-			yield return [(Source: asyncMethodName, Path: path), new AsyncData {
-				MethodName = "ApplyTheSnapshotAsync"
-			}];
+
+			yield return [(Source: asyncMethodName, Path: path),
+				new AsyncData {
+					MethodName = "ApplyTheSnapshotAsync"
+				}];
 
 			const string asyncTypeOf = @"
 using System;
@@ -104,10 +106,11 @@ interface NSTableViewDiffableDataSource {
 	void ApplySnapshot (NSObject snapshot, bool animatingDifferences, [NullAllowed] Action completion);
 }
 ";
-			
-			yield return [(Source: asyncTypeOf, Path: path), new AsyncData {
-				ResultType = "Test.SampleResult"
-			}];
+
+			yield return [(Source: asyncTypeOf, Path: path),
+				new AsyncData {
+					ResultType = "Test.SampleResult"
+				}];
 
 			const string postResult = @"
 using System;
@@ -130,10 +133,11 @@ interface NSTableViewDiffableDataSource {
 }
 ";
 
-			yield return [(Source: postResult, Path: path), new AsyncData {
-				ResultTypeName = "NSUrlSessionDataTaskRequest",
-				PostNonResultSnippet = "result.Resume ();"
-			}];
+			yield return [(Source: postResult, Path: path),
+				new AsyncData {
+					ResultTypeName = "NSUrlSessionDataTaskRequest",
+					PostNonResultSnippet = "result.Resume ();"
+				}];
 		}
 
 		IEnumerator IEnumerable.GetEnumerator () => GetEnumerator ();

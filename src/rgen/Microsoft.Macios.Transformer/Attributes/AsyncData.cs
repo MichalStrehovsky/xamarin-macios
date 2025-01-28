@@ -14,14 +14,14 @@ readonly struct AsyncData : IEquatable<AsyncData> {
 		ResultType,
 		MethodName
 	}
-	
+
 	public string? ResultType { get; init; } // this in the attr is a type, but we do not care for the transformation
 	public string? MethodName { get; init; }
 	public string? ResultTypeName { get; init; }
 	public string? PostNonResultSnippet { get; init; }
-	
-	public AsyncData () {}
-	
+
+	public AsyncData () { }
+
 	public AsyncData (string resultType, ConstructorType constructorType)
 	{
 		if (constructorType == ConstructorType.ResultType)
@@ -40,25 +40,25 @@ readonly struct AsyncData : IEquatable<AsyncData> {
 		string? resultTypeName = null;
 		string? methodName = null;
 		string? postNonResultSnippet = null;
-		
+
 		switch (count) {
-		case 0: 
+		case 0:
 			break;
 		case 1:
 			// we have to diff constructors that take a single parameter, either a string or a type
-			if (attributeData.ConstructorArguments[0].Value! is string methodNameValue) {
+			if (attributeData.ConstructorArguments [0].Value! is string methodNameValue) {
 				constructorType = ConstructorType.MethodName;
 				methodName = methodNameValue;
 			} else {
 				constructorType = ConstructorType.ResultType;
-				resultType = ((INamedTypeSymbol) attributeData.ConstructorArguments[0].Value!).ToDisplayString();
+				resultType = ((INamedTypeSymbol) attributeData.ConstructorArguments [0].Value!).ToDisplayString ();
 			}
 			break;
 		default:
 			// 0 should not be an option..
 			return false;
 		}
-		
+
 		if (attributeData.NamedArguments.Length == 0) {
 			if (constructorType == ConstructorType.ResultType)
 				data = new (resultType!, ConstructorType.ResultType);
@@ -70,7 +70,7 @@ readonly struct AsyncData : IEquatable<AsyncData> {
 		foreach (var (argumentName, value) in attributeData.NamedArguments) {
 			switch (argumentName) {
 			case "ResultType":
-				resultType = ((INamedTypeSymbol) value.Value!).ToDisplayString();
+				resultType = ((INamedTypeSymbol) value.Value!).ToDisplayString ();
 				break;
 			case "MethodName":
 				methodName = (string) value.Value!;
@@ -89,7 +89,7 @@ readonly struct AsyncData : IEquatable<AsyncData> {
 
 		if (count == 0) {
 			// use the default constructor and use the init properties
-			data = new() {
+			data = new () {
 				ResultType = resultType,
 				MethodName = methodName,
 				ResultTypeName = resultTypeName,
@@ -98,8 +98,7 @@ readonly struct AsyncData : IEquatable<AsyncData> {
 			return true;
 		}
 
-		switch (constructorType)
-		{
+		switch (constructorType) {
 		case ConstructorType.MethodName:
 			data = new (methodName!, ConstructorType.MethodName) {
 				ResultType = resultType,
@@ -118,7 +117,7 @@ readonly struct AsyncData : IEquatable<AsyncData> {
 
 		return false;
 	}
-	
+
 	public bool Equals (AsyncData other)
 	{
 		if (ResultType != other.ResultType)
