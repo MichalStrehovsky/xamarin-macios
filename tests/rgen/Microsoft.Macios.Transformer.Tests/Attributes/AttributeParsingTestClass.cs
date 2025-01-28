@@ -9,7 +9,7 @@ using Xamarin.Utils;
 namespace Microsoft.Macios.Transformer.Tests.Attributes;
 
 public class AttributeParsingTestClass : BaseTransformerTestClass {
-	
+
 	internal void AssertTryCreate<T, TR> (ApplePlatform platform, (string Source, string Path) source,
 		string attributeName, T expectedData, TypeSymbolExtensions.TryParse<T> tryParse, bool lastOrDefault = false)
 		where T : struct
@@ -29,7 +29,7 @@ public class AttributeParsingTestClass : BaseTransformerTestClass {
 		if (lastOrDefault) {
 			declaration = syntaxTree.GetRoot ()
 				.DescendantNodes ().OfType<TR> ()
-				.LastOrDefault();
+				.LastOrDefault ();
 		} else {
 			declaration = syntaxTree.GetRoot ()
 				.DescendantNodes ().OfType<TR> ()
